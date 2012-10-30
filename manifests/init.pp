@@ -15,9 +15,12 @@
 
 class serverdensity ($agent_key, $acc_name, $options=['']) {
 
+  $repo_key_fname = "boxedice-public.key"
   $repo_key = 'https://www.serverdensity.com/downloads/boxedice-public.key'
 
   if $osfamily == 'debian' {
+    $wget_repo_key = ""
+    $wget_cwd = ""
     $install_repo_key = "curl $repo_key | apt-key add -"
     $install_repo_key_stop_condition = 'apt-key list | grep -c "Server Density"'
     $repo_path = '/etc/apt/sources.list.d/sd-agent.list'
@@ -34,17 +37,31 @@ class serverdensity ($agent_key, $acc_name, $options=['']) {
     }
 
   } elsif $osfamily == 'redhat' {
-    $install_repo_key = "rpm --import $repo_key"
+    $wget_repo_key = "wget $repo_key"
+    $wget_cwd = "/usr/local/src"
+    #$install_repo_key = "rpm --import $repo_key"
+    $install_repo_key = "rpm --import $wget_cwd/$repo_key_fname"
     $install_repo_key_stop_condition = undef
     $repo_path = '/etc/yum.repos.d/serverdensity.repo'
     $repo_file_name = 'serverdensity.repo'
   }
 
-	exec { 'server-density-repo-key':
-		path    => '/bin:/usr/bin',
-		command => $install_repo_key,
-		unless  => $install_repo_key_stop_condition,
-	}
+  exec { 'wget-server-density-repo-key':
+    path => '/bin:/usr/bin',
+    cwd => $wget_cwd,
+    command => $wget_repo_key,
+    unless => $install_repo_key_stop_condition,
+    onlyif => "test ! $wget_cwd/$repo_key_fname",
+    notify => Exec["server-density-repo-key"],
+  }
+
+    
+  exec { 'server-density-repo-key':
+    path    => '/bin:/usr/bin',
+    command => $install_repo_key,
+    unless  => $install_repo_key_stop_condition,
+    refreshonly => true,
+  }
 
   file { 'server-density-repo':
     path    => $repo_path,
