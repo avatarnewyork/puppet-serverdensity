@@ -13,7 +13,7 @@
 #    agent_key => '6f5902ac237024bdd0c176cb93063dc4'
 #  }
 
-class serverdensity ($agent_key, $options=['']) {
+class serverdensity ($agent_key, $acc_name, $options=['']) {
 
   $repo_key = 'https://www.serverdensity.com/downloads/boxedice-public.key'
 
