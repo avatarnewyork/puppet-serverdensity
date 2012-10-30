@@ -25,10 +25,12 @@ class serverdensity ($agent_key, $acc_name, $options=['']) {
     #$update_pkg_manager = Class['apt']
 
     exec { 'sd run apt-update':
-      require => File['server-density-repo'],
-      before  => Package['sd-agent'],
-      command => 'apt-get update',
-      path    => '/usr/bin/',
+      require     => File['server-density-repo'],
+      before      => Package['sd-agent'],
+      command     => 'apt-get update',
+      path        => '/usr/bin/',
+      subscribe   => File['server-density-repo'],
+      refreshonly => true,
     }
 
   } elsif $osfamily == 'redhat' {
