@@ -19,6 +19,7 @@ class serverdensity ($agent_key, $options=['']) {
 
   if $osfamily == 'debian' {
     $install_repo_key = "curl $repo_key | apt-key add -"
+    $install_repo_key_stop_condition = 'apt-key list | grep -c "Server Density"'
     $repo_path = '/etc/apt/sources.list.d/sd-agent.list'
     $repo_file_name = 'sd-agent.list'
     #$update_pkg_manager = Class['apt']
@@ -32,6 +33,7 @@ class serverdensity ($agent_key, $options=['']) {
 
   } elsif $osfamily == 'redhat' {
     $install_repo_key = "rpm --import $repo_key"
+    $install_repo_key_stop_condition = undef
     $repo_path = '/etc/yum.repos.d/serverdensity.repo'
     $repo_file_name = 'serverdensity.repo'
   }
@@ -39,6 +41,7 @@ class serverdensity ($agent_key, $options=['']) {
 	exec { 'server-density-repo-key':
 		path    => '/bin:/usr/bin',
 		command => $install_repo_key,
+		unless  => $install_repo_key_stop_condition,
 	}
 
   file { 'server-density-repo':
