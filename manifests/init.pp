@@ -51,7 +51,8 @@ class serverdensity ($agent_key, $acc_name, $options=['']) {
     cwd => $wget_cwd,
     command => $wget_repo_key,
     unless => $install_repo_key_stop_condition,
-    onlyif => "test ! $wget_cwd/$repo_key_fname",
+    #onlyif => "test ! $wget_cwd/$repo_key_fname",
+    refreshonly => true,
     notify => Exec["server-density-repo-key"],
   }
 
