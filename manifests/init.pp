@@ -70,7 +70,7 @@ class serverdensity ($agent_key='', $acc_name, $options=['']) {
   package {"rest-client":
     ensure => "latest",
     provider => gem,
-    require => Package["mime-types"]
+    require => Package["mime-types"],
   }
   
   file {$serverdensity_addclient :
@@ -78,7 +78,7 @@ class serverdensity ($agent_key='', $acc_name, $options=['']) {
     mode => "0700",
     owner => "root",
     group => "root",
-    require => Package["rest-client"],
+    require => [Package["rest-client"], Package["json"], Package["mime-types"]],
     notify => Exec[$serverdensity_addclient],
   }
 
