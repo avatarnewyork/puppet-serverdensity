@@ -14,7 +14,7 @@ device_details = JSON.parse(RestClient.post(serverdensity_url, :name => '<%= hos
 
 
 # Write agent key to file
-File.open('<%= sdkeyfile %>', 'w') {|f| f.write(agentcsv) }
+File.open('<%= sdkeyfile %>', 'w') {|f| f.write(device_details["data"]["agentKey"]) }
 
 Facter.add(:serverdensity_key) do
   setcode do
