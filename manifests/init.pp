@@ -58,7 +58,7 @@ class serverdensity ($agent_key='', $acc_name, $options=['']) {
   }
   
   file {$serverdensity_addclient :
-    content => template("serverdensity/serverdensity_addclient.rb.erb")
+    content => template("serverdensity/serverdensity_addclient.rb.erb"),
     mode => "0700",
     owner => "root",
     group => "root",
