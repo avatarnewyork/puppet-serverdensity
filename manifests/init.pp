@@ -54,10 +54,16 @@ class serverdensity ($agent_key='', $acc_name, $options=['']) {
   if !$serverdensity_key {
     $serverdensity_key = ''
   }
-  
+
+  package {"mime-types":
+    ensure => "1.16",
+    provider => gem,
+  }
+
   package {"rest-client":
     ensure => "latest",
     provider => gem,
+    require => Package["mime-types"],
   }
   
   file {$serverdensity_addclient :
