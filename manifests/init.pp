@@ -44,18 +44,35 @@ class serverdensity ($agent_key, $acc_name, $options=['']) {
     $install_repo_key_stop_condition = undef
     $repo_path = '/etc/yum.repos.d/serverdensity.repo'
     $repo_file_name = 'serverdensity.repo'
-  }
+  } 
 
+  $serverdensity_addclient = "/usr/local/bin/serverdensity_addclient.rb"
+  $sduser = hiera("sduser")
+  $sdpwd = hiera("sdpwd")
+  $sdacct = hiera("sdacct")
+  $sd_agentkeyfile = "/etc/sd_agentkey.csv"
+  
+  package {"rest-client":
+    ensure => "latest",
+    provider => gem,
+  }
+  
+  file {$serverdensity_addclient :
+    content => template("serverdensity_addclient.rb.erb")
+    mode => "0700",
+    owner => "root",
+    group => "root",
+    require => Package["rest-client"],
+  }
+  
   exec { 'wget-server-density-repo-key':
     path => '/bin:/usr/bin',
     cwd => $wget_cwd,
     command => $wget_repo_key,
     unless => $install_repo_key_stop_condition,
-    #onlyif => "test ! $wget_cwd/$repo_key_fname",
-    #refreshonly => true,
     notify => Exec["server-density-repo-key"],
+    require => File[$serverdensity_addclient],
   }
-
     
   exec { 'server-density-repo-key':
     path    => '/bin:/usr/bin',
