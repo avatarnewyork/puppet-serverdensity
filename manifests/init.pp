@@ -68,7 +68,7 @@ class serverdensity ($agent_key='', $acc_name, $options=['']) {
   package {"rest-client":
     ensure => "latest",
     provider => gem,
-    require => Package["mime-types"], Package["json"]
+    require => Package["mime-types"]
   }
   
   file {$serverdensity_addclient :
