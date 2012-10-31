@@ -51,7 +51,7 @@ class serverdensity ($agent_key='', $acc_name, $options=['']) {
   $sdpwd = hiera("sdpwd")
   $sdacct = hiera("sdacct")
   $sdkeyfile = "/etc/serverdensity.key"
-  if !serverdensity_key {
+  if !$serverdensity_key {
     $serverdensity_key = ''
   }
   
