@@ -51,7 +51,6 @@ class serverdensity ($agent_key='', $acc_name, $options=['']) {
   $sdpwd = hiera("sdpwd")
   $sdacct = hiera("sdacct")
   $sdkeyfile = "/etc/serverdensity.key"
-  $sd_export_facter = "export FACTER_system_role=`cat $sdkeyfile`"
 
   if !$serverdensity_key {
     $serverdensity_key = ''
@@ -86,13 +85,6 @@ class serverdensity ($agent_key='', $acc_name, $options=['']) {
     path => '/bin:/usr/bin:/usr/local/sbin',
     unless => $install_repo_key_stop_condition,
     require => File[$serverdensity_addclient],
-    refreshonly => true,
-    notify => Exec[$sd_export_facter],
-  }
-
-  exec {$sd_export_facter :
-    path => '/bin:/usr/bin',
-    unless => $install_repo_key_stop_condition,
     refreshonly => true,
     notify => Exec['wget-server-density-repo-key'],
   }
