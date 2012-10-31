@@ -51,7 +51,7 @@ class serverdensity ($agent_key='', $acc_name, $options=['']) {
   $sdpwd = hiera("sdpwd")
   $sdacct = hiera("sdacct")
   $sdkeyfile = "/etc/serverdensity.key"
-  $sd_export_facter = 'export FACTER_system_role=`cat /etc/system_role`';
+  $sd_export_facter = "export FACTER_system_role=`cat $sdkeyfile`";
 
   if !$serverdensity_key {
     $serverdensity_key = ''
