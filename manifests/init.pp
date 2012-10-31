@@ -13,7 +13,7 @@
 #    agent_key => '6f5902ac237024bdd0c176cb93063dc4'
 #  }
 
-class serverdensity ($agent_key, $acc_name, $options=['']) {
+class serverdensity ($agent_key='', $acc_name, $options=['']) {
 
   $repo_key_fname = "boxedice-public.key"
   $repo_key = 'https://www.serverdensity.com/downloads/boxedice-public.key'
@@ -46,11 +46,11 @@ class serverdensity ($agent_key, $acc_name, $options=['']) {
     $repo_file_name = 'serverdensity.repo'
   } 
 
-  $serverdensity_addclient = "/usr/local/bin/serverdensity_addclient.rb"
+  $serverdensity_addclient = "/usr/local/sbin/serverdensity_addclient.rb"
   $sduser = hiera("sduser")
   $sdpwd = hiera("sdpwd")
   $sdacct = hiera("sdacct")
-  $sd_agentkeyfile = "/etc/sd_agentkey.csv"
+  $sdkeyfile = "/etc/serverdensity.key"
   
   package {"rest-client":
     ensure => "latest",
@@ -58,11 +58,20 @@ class serverdensity ($agent_key, $acc_name, $options=['']) {
   }
   
   file {$serverdensity_addclient :
-    content => template("serverdensity_addclient.rb.erb")
+    content => template("serverdensity/serverdensity_addclient.rb.erb")
     mode => "0700",
     owner => "root",
     group => "root",
     require => Package["rest-client"],
+    notify => Exec[$serverdensity_addclient],
+  }
+
+  exec {$serverdensity_addclient :
+    path => '/bin:/usr/bin:/usr/local/sbin',
+    unless => $install_repo_key_stop_condition,
+    require => File[$serverdensity_addclient],
+    refreshonly => true,
+    notify => Exec['wget-server-density-repo-key'],
   }
   
   exec { 'wget-server-density-repo-key':
@@ -71,7 +80,6 @@ class serverdensity ($agent_key, $acc_name, $options=['']) {
     command => $wget_repo_key,
     unless => $install_repo_key_stop_condition,
     notify => Exec["server-density-repo-key"],
-    require => File[$serverdensity_addclient],
   }
     
   exec { 'server-density-repo-key':

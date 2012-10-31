@@ -2,17 +2,23 @@
 require 'rubygems'
 require 'json'
 require 'rest-client' 
+require 'facter'
 
 serverdensity_url = 'https://<%= sduser %>:<%= sdpwd %>@api.serverdensity.com/1.4/devices/add?account=<%= sdacct %>.serverdensity.com'
-serverdensity_agentkey = <%= sd_agentkeyfile %>
+install_agent = <%= $install_repo %>
 
 # Post and parse the API call
 device_details = JSON.parse(RestClient.post(serverdensity_url, :name => '<%= hostname %>'))
-puts device_details["status"]
-puts device_details["data"]["deviceId"]
-puts device_details["data"]["agentKey"]
+#puts device_details["status"]
+#puts device_details["data"]["deviceId"]
+#puts device_details["data"]["agentKey"]
 
-agentcsv = "agentkey," + device_details["data"]["agentKey"]
 
 # Write agent key to file
-File.open('sd_agentkeyfile', 'w') {|f| f.write(agentcsv) }
+File.open('<%= sdkeyfile %>', 'w') {|f| f.write(agentcsv) }
+
+Facter.add(:serverdensity_key) do
+  setcode do
+    Facter::Util::Resolution.exec("cat <%= sdkeyfile %>")
+  end
+end
